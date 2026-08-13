@@ -2,7 +2,8 @@
 
 一个在本地运行的图像理解、Prompt 生成与参考图重建工具。项目以 BLIP 为视觉语言模型核心，结合 Faster R-CNN、ResNet50、Stable Diffusion 1.5、IP-Adapter 和 ControlNet，将输入图片转换为可阅读、可编辑、可用于图像生成的结构化描述。
 
-> 仓库不包含模型权重。模型需按 [MODEL_SETUP.md](MODEL_SETUP.md) 单独准备。完整参数、配置和故障排查请阅读 [READ.md](READ.md)。
+> 仓库不包含模型权重。模型需按 [MODEL_SETUP.md](MODEL_SETUP.md) 单独准备。本文包含常用参数、运行方式和故障边界。
+> 仅执行图片分析和 Prompt 生成时不需要 Stable Diffusion、IP-Adapter 或 ControlNet；开启参考图生成时才需要 CUDA 与对应模型。
 
 ## 核心能力
 
@@ -63,17 +64,33 @@
 Reconstruction + Hybrid + strength 0.15-0.25
 ```
 
-## 环境要求
+## 安装与环境
 
-- Python 3.9 或兼容版本
+- Python 3.9+
 - NVIDIA GPU 与 CUDA 版 PyTorch（执行 Stable Diffusion 生成时需要）
-- 项目已在 RTX 4060 Laptop 8GB、PyTorch `2.7.1+cu118` 环境验证
+- 图片分析可以在没有 CUDA 的环境中运行，但检测、分类和 BLIP 仍需安装相应依赖
+
+克隆项目并进入目录：
+
+```powershell
+git clone https://github.com/Le1power/vlm-vision-studio.git
+cd vlm-vision-studio
+```
+
+建议使用独立虚拟环境：
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
 
 安装 Python 依赖：
 
 ```powershell
 python -m pip install -r requirements.txt
 ```
+
+如果需要 CUDA 生成，请先按照 NVIDIA 驱动和 CUDA 版本安装匹配的 PyTorch，再安装其余依赖。
 
 检查依赖、CUDA 和本地模型：
 
@@ -82,6 +99,18 @@ python scripts/check_model_setup.py
 ```
 
 检查脚本不会主动下载模型。
+
+## 配置
+
+默认配置位于 `configs/default.yaml`。常用配置包括：
+
+- `vlm.model_name`：BLIP 的本地目录或 Hugging Face 缓存标识。
+- `generation.model_name`：Stable Diffusion 1.5 Diffusers 目录。
+- `generation.mode`：`img2img`、`ip_adapter`、`controlnet` 或 `hybrid`。
+- `generation.strength`：去噪强度，数值越低越接近输入图像。
+- `paths.output_dir`：分析、面板和生成结果的输出目录。
+
+项目默认将 `vlm.local_files_only` 设为 `true`，因此 BLIP 不会在运行时自动联网补齐文件。模型目录和离线准备方式见 [MODEL_SETUP.md](MODEL_SETUP.md)。
 
 ## 模型准备
 
@@ -173,7 +202,7 @@ print(result["reconstruction_context"]["detailed_prompt"])
 
 ## 输出内容
 
-默认结果保存在 `outputs/`：
+使用 `scripts/run_demo.py` 时，结果保存在 `outputs/`：
 
 ```text
 outputs/
@@ -193,6 +222,8 @@ outputs/
 - `generation.pixel_similarity`
 - `degraded_notes`
 
+直接调用 Python API 时，`Pipeline.run()` 返回内存中的结果字典；只有调用方主动保存时才会生成 JSON 文件。
+
 `pixel_similarity` 是基于像素误差的辅助指标，不等同于语义或感知质量评分。
 
 ## 测试
@@ -201,7 +232,7 @@ outputs/
 python -m pytest -q
 ```
 
-当前测试结果：
+当前仓库测试结果：
 
 ```text
 49 passed
@@ -219,14 +250,13 @@ src/generation/             Stable Diffusion 条件生成
 src/evaluation/             评估指标
 src/report/                 报告生成
 tests/                      单元测试
-READ.md                     完整使用手册
 MODEL_SETUP.md              模型准备说明
 ```
 
 ## 文档
 
-- [完整使用手册](READ.md)
 - [模型安装说明](MODEL_SETUP.md)
+
 ## License
 
 [MIT](LICENSE)
