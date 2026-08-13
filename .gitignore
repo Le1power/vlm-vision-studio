@@ -43,7 +43,7 @@ outputs/
 *.log
 
 # Downloaded model weights and nested model repositories
-models/
+/models/
 *.pt
 *.pth
 *.bin
@@ -66,4 +66,4 @@ models_cache/
 Thumbs.db
 
 # Local Git metadata accidentally copied into model folders
-models/**/.git/
+/models/**/.git/
