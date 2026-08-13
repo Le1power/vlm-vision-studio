@@ -1,0 +1,63 @@
+# vlm-vision-studio 默认配置
+# 所有模型名称、阈值、路径集中管理，便于复现实验
+
+project:
+  name: vlm-vision-studio
+  version: 0.1.0
+
+# 目标检测（torchvision Faster R-CNN 预训练权重）
+detection:
+  model_name: fasterrcnn_resnet50_fpn_v2
+  score_threshold: 0.5        # 检测置信度阈值
+  max_detections: 20          # 单图最多保留的检测框数量
+  max_side: 1024              # 推理前最长边上限，降低超大图像的内存占用
+
+# 图像分类（torchvision ResNet50 预训练权重）
+classification:
+  model_name: resnet50
+  top_k: 5                    # 返回 Top-K 类别
+  prompt_min_score: 0.2       # 低于该置信度的分类不会写入 Prompt
+
+# VLM 图像描述（HuggingFace BLIP）
+vlm:
+  # 可改为本地目录，例如 models/blip-image-captioning-base
+  model_name: Salesforce/blip-image-captioning-base
+  max_new_tokens: 30          # 描述生成的最大 token 数
+  fallback_enabled: true      # 依赖缺失时启用基于检测/分类结果的降级描述
+  local_files_only: true      # 仅使用本地缓存，避免运行时自动补下载其他权重格式
+
+# Prompt 工程
+prompt:
+  language: en                # 输出提示词语言（文生图模型通常英文效果更优）
+  default_style: cinematic    # 默认风格模板
+  optimize_rounds: 2          # Prompt 迭代优化轮数
+  negative_prompt: true       # 是否附加负向提示词
+
+# 评估与报告
+evaluation:
+  min_caption_words: 5        # 描述质量：最少词数
+  min_ttr: 0.4                # 描述质量：词汇丰富度（TTR）下限
+
+# 参考图重绘。默认关闭，命令行传入 --generate 可单次开启。
+generation:
+  enabled: false
+  # 以下模型标识均可替换为已下载的本地目录。
+  model_name: models/stable-diffusion-v1-5
+  mode: img2img               # img2img / ip_adapter / controlnet / hybrid
+  strength: 0.28              # 越低越接近原图，建议 0.20~0.40
+  guidance_scale: 7.0
+  steps: 25
+  seed: 42
+  ip_adapter_repo: models/IP-Adapter
+  ip_adapter_weight: ip-adapter_sd15.bin
+  ip_adapter_scale: 0.65
+  controlnet_model: models/sd-controlnet-canny
+
+# 手动下载模型时建议统一放在此目录；运行时仍以各模块 model_name 为准。
+model_storage:
+  root_dir: models
+
+paths:
+  output_dir: outputs         # 中间结果（可视化图、JSON）输出目录
+  report_dir: reports         # Markdown 测试报告输出目录
+  examples_dir: assets/examples

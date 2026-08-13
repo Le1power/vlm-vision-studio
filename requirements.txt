@@ -1,0 +1,26 @@
+# 深度学习框架（重依赖，运行检测/分类/VLM 时需要，代码中均懒加载）
+torch>=2.0.0
+torchvision>=0.15.0
+
+# VLM 图像描述模型（Salesforce/blip-image-captioning-base）
+transformers>=4.30.0
+diffusers>=0.35.0
+accelerate>=1.0.0
+safetensors>=0.4.0
+huggingface-hub>=0.25.0
+
+# 计算机视觉预处理（CI/测试环境可改用 opencv-python-headless，无 GUI 依赖）
+opencv-python>=4.8.0  # 无 GUI 环境请安装 opencv-python-headless>=4.8.0
+
+# 图像与数据处理
+pillow>=9.5.0
+numpy>=1.24.0
+
+# 配置文件解析
+pyyaml>=6.0.0
+
+# 单元测试（不依赖模型下载）
+pytest>=7.4.0
+
+# 本地交互界面（兼容当前 Python 3.9 CUDA 环境）
+streamlit>=1.35.0,<1.46.0
