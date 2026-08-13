@@ -2,15 +2,21 @@
 
 项目代码和 Python 依赖已经配置完成。模型权重可由你自行下载，并统一放在项目根目录的 `models/` 下。不要改变模型仓库内部的文件结构。
 
-## 当前 GPU 环境
+## 运行环境
 
-推荐使用现有解释器：
+建议先创建并激活独立的 Python 环境：
 
 ```powershell
-D:\miniconda\envs\yolov8\python.exe
+conda create -n vlm-vision-studio python=3.9 -y
+conda activate vlm-vision-studio
+python -m pip install -r requirements.txt
 ```
 
-该环境已确认：PyTorch `2.7.1+cu118`、torchvision `0.22.1+cu118`，CUDA 可用，GPU 为 RTX 4060 Laptop 8GB。
+执行 Stable Diffusion 生成需要 NVIDIA GPU 和 CUDA 版 PyTorch。请根据本机 CUDA 与驱动版本安装匹配的 PyTorch，并通过以下命令确认 CUDA 可用：
+
+```powershell
+python -c "import torch; print(torch.cuda.is_available())"
+```
 
 ## 需要的模型
 
@@ -33,10 +39,17 @@ vlm:
 
 ### 2. torchvision 检测与分类
 
-将以下两个权重文件放入：
+torchvision 默认会在用户缓存目录中管理以下两个权重文件：
 
 ```text
-C:\Users\25947\.cache\torch\hub\checkpoints\
+<TORCH_HOME>/hub/checkpoints/
+```
+
+未设置 `TORCH_HOME` 时，常见默认位置为：
+
+```text
+Windows: %USERPROFILE%\.cache\torch\hub\checkpoints\
+Linux/macOS: ~/.cache/torch/hub/checkpoints/
 ```
 
 文件名必须保持为：
@@ -122,25 +135,25 @@ generation:
 检查环境和本地模型路径（不会下载任何内容）：
 
 ```powershell
-D:\miniconda\envs\yolov8\python.exe scripts/check_model_setup.py
+python scripts/check_model_setup.py
 ```
 
 普通低强度 img2img：
 
 ```powershell
-D:\miniconda\envs\yolov8\python.exe scripts/run_demo.py --image assets/examples/sample_shapes.png --generate --mode img2img --strength 0.25
+python scripts/run_demo.py --image assets/examples/sample_shapes.png --generate --mode img2img --strength 0.25
 ```
 
 更强调参考图视觉特征：
 
 ```powershell
-D:\miniconda\envs\yolov8\python.exe scripts/run_demo.py --image path/to/photo.jpg --generate --mode ip_adapter --strength 0.25
+python scripts/run_demo.py --image path/to/photo.jpg --generate --mode ip_adapter --strength 0.25
 ```
 
 更强调边缘与构图：
 
 ```powershell
-D:\miniconda\envs\yolov8\python.exe scripts/run_demo.py --image path/to/photo.jpg --generate --mode controlnet --strength 0.30
+python scripts/run_demo.py --image path/to/photo.jpg --generate --mode controlnet --strength 0.30
 ```
 
 输出图像保存为 `outputs/<原文件名>_generated.png`。`strength` 越低越接近原图；建议从 `0.20` 到 `0.35` 调整。

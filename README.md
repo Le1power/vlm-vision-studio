@@ -171,8 +171,6 @@ print(result["prompt"])
 print(result["reconstruction_context"]["detailed_prompt"])
 ```
 
-将核心功能嵌入网站时，请阅读 [WEB_INTEGRATION_CONTEXT.md](WEB_INTEGRATION_CONTEXT.md)。其中包含推荐 API、返回字段、GPU 队列、上传安全和验收标准。
-
 ## 输出内容
 
 默认结果保存在 `outputs/`：
@@ -223,15 +221,12 @@ src/report/                 报告生成
 tests/                      单元测试
 READ.md                     完整使用手册
 MODEL_SETUP.md              模型准备说明
-WEB_INTEGRATION_CONTEXT.md  网站集成任务说明
 ```
 
 ## 文档
 
 - [完整使用手册](READ.md)
 - [模型安装说明](MODEL_SETUP.md)
-- [网站集成说明](WEB_INTEGRATION_CONTEXT.md)
-
 ## License
 
 [MIT](LICENSE)
